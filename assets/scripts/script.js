@@ -156,6 +156,7 @@ function updateRGB(hexInputs, rgbInputs){
         rgbInputs[5].value = "";
     }
 }
+
 // Toggles help menu
 function helpMenu(){
     document.getElementById("help").classList.toggle("active");

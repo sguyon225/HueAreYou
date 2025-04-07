@@ -109,9 +109,11 @@ h2{
 .wrapper input.correct {
     background-color: #4aff18;
     border-color: #32cd32;
-    
-}
 
+}
+.wrapper input.correct:disabled {
+    color: black;    
+}
 .wrapper input.close {
     background-color: #f1c811;
     border-color: #ffa500;
