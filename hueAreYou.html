@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Hue Are You?</title>
+    <link rel="styleSheet" href="styles.css">
+    <script>
+        var hexcode = "#";
+        var invertHex = "#"
+        var rgb = [];
+        var invertRGB = [];
+
+        function newColor(){
+            for(let i=0;i<6;i++){
+                hexcode=hexcode+randomNumber();
+            }            
+            document.getElementById("body").style.backgroundColor = hexcode;
+
+            rgb = hexToRGB();
+            invertColor(); 
+
+            let under20 = 0;
+            let over200 = false;
+            let text = document.getElementById("body")
+            for(color in invertRGB){
+                if(invertRGB[color]<20){
+                    under20++;
+                }
+            }
+
+            if(under20>=2){
+                // document.getElementsByTagName("h2")[0].style.textShadow = "0px 0px black";
+                // Remove shadow, add back when reloaded
+            }
+
+            console.log("hex: "+hexcode);
+            console.log("invert hex: "+invertHex);
+            console.log("rgb: "+rgb);
+        }
+        
+        function invertColor(){
+            let invRGB = [255-rgb[0], 255-rgb[1], 255-rgb[2]];
+
+            invertHex = "#"+invRGB[0].toString(16).padStart(2, '0')+invRGB[1].toString(16).padStart(2, '0')+invRGB[2].toString(16).padStart(2, '0');
+            document.getElementsByClassName("text")[0].style.color = invertHex;
+            document.getElementById("submit").style.backgroundColor = invertHex;
+        }
+
+        function hexToRGB(){
+            let hexArr = hexcode.split("");
+
+            let redHex = (hexArr[1]+hexArr[2]);
+            let red = parseInt(redHex, 16);
+
+            let greenHex = (hexArr[3]+hexArr[4]);
+            let green = parseInt(greenHex, 16);
+            
+            let blueHex = (hexArr[5]+hexArr[6]);
+            let blue = parseInt(blueHex, 16);
+            return [red, green, blue];
+        }
+        
+        function setRGB(){
+            let hexArr = hexcode.split("");
+            document.getElementById("red").style.backgroundColor = "#"+hexArr[1]+hexArr[2]+"0000";
+            document.getElementById("green").style.backgroundColor = "#00"+hexArr[3]+hexArr[4]+"00";
+            document.getElementById("blue").style.backgroundColor = "#0000"+hexArr[5]+hexArr[6];
+
+            if(rgb[0]<127.5){
+                document.getElementById("red").style.color = "white";
+            }
+            if(rgb[1]<127.5){
+                document.getElementById("green").style.color = "white";
+            }
+            if(rgb[2]<127.5){
+                document.getElementById("blue").style.color = "white";
+            }
+        }
+
+        function randomNumber(){
+            let num=Math.floor((Math.random()*100)) % 16;
+            if(num>9){
+                num=num.toString(16).toUpperCase();
+            }
+            return num;
+        }
+        
+        function check(code){
+            console.log("check: "+hexcode+" = "+code)
+            for(let i=1; i<7; i++){
+                checkInput(code, i)
+            }
+        }
+        function checkInput(code, index){
+            code = code.split("");
+            let hex = hexcode.split("");
+            let hexInputs = document.querySelectorAll(".digit");
+            let distance = parseInt(code[index], 16)-parseInt(hex[index], 16);
+            let input = hexInputs[index-1];
+            try{input.classList.remove("down")}catch{}
+            try{input.classList.remove("up")}catch{}
+            try{input.classList.remove("close")}catch{}
+            input.placeholder=code[index];
+            if(code[index] == hexcode[index]){
+                // If hex value is correct
+                input.classList.add("correct");
+            }else if( Math.abs(distance) < 5){
+                //If hex value is within 5
+                input.classList.add("close");
+                if(distance<0){
+                    // Above
+                    input.classList.add("up");
+                    console.log(distance);
+                }else{
+                    //below
+                    input.classList.add("down");
+                }
+            }
+        }
+
+        function helpMenu(){
+            document.getElementById("help").classList.toggle("active");
+        }
+
+        document.addEventListener("DOMContentLoaded", function() {    
+            const hexInputs = document.querySelectorAll(".digit");
+            const rgbInputs = document.getElementById("rgb").childNodes;
+
+            // Submission with enter
+            document.addEventListener("keypress", (e) => {
+                    if (e.key === 'Enter') {
+                        let code = "#"+Array.from(hexInputs).map(i => i.value).join('');
+                        if(code.length == 7){
+                            check(code);
+                        }
+                    }
+                });
+
+            hexInputs.forEach((input, index) => {
+                input.setAttribute("maxlength", "1");
+
+                input.addEventListener("beforeinput", (e) => {
+                    const char = e.data?.toUpperCase();
+                    if (e.inputType === "insertText" && !/^[A-F0-9]$/.test(char)) {
+                        e.preventDefault();
+                    }
+                });
+
+                input.addEventListener("input", (e) => {
+                    const char = e.target.value.toUpperCase().replace(/[^A-F0-9]/g, "");
+                    if (char) {
+                        e.target.value = char; // Always overwrite with last valid character
+
+                        // Move to next input unless it's the last one
+                        if (index < hexInputs.length - 1) {
+                            hexInputs[index + 1].focus();
+                        }
+                    }
+
+                    let red="";
+                    let green="";
+                    let blue="";
+
+                    if (hexInputs[0].value!="" && hexInputs[1].value!=""){
+                        red = parseInt(hexInputs[0].value+hexInputs[1].value, 16);
+                    }
+                    if (hexInputs[2].value && hexInputs[3].value){
+                        green = parseInt(hexInputs[3].value+hexInputs[2].value, 16);
+                    }
+                    if (hexInputs[4].value && hexInputs[5].value){
+                        blue = parseInt(hexInputs[4].value+hexInputs[5].value, 16);
+                    }
+                    if(red!=""){
+                        if(red == "NaN"){
+                            red = ""
+                        }
+                        rgbInputs[1].value = red;
+                    }
+                    if(green!=""){
+                        if(green == "NaN"){
+                            green = ""
+                        }
+                        rgbInputs[3].value = green;
+                    }
+                    if(blue!=""){
+                        if(blue == "NaN"){
+                            blue = ""
+                        }
+                        rgbInputs[5].value = blue;
+                    }
+
+                });
+
+                // Backspace
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "Backspace") {
+                        e.preventDefault();
+
+                        if (input.value) {
+                            input.value = "";
+                        } else if (index > 0) {
+                            hexInputs[index - 1].focus();
+                            hexInputs[index - 1].value = "";
+                        }
+                    }
+                });
+
+                // Left Arrow
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "ArrowLeft" && index > 0) {
+                        hexInputs[index - 1].focus();
+                    }
+                });
+
+                // Right Arrow
+                input.addEventListener("keydown", (e) => {
+                    if (e.key === "ArrowRight" && index < 5) {
+                        hexInputs[index + 1].focus();
+                    }
+                });
+
+                // .focus
+                input.addEventListener("focus", () => {
+                    setTimeout(() => input.setSelectionRange(0, 1), 0);
+                });
+            });
+
+            rgbInputs.forEach((input, index) =>{
+                input.addEventListener("input", (e) => {
+                    e.target.value = e.target.value.replace(/\D/, "");
+                    
+                    let popup = document.getElementById("popup");
+                    let color = input.classList[0]
+                    let colorPop = document.getElementsByClassName(color)[1];
+
+                    if(input.value>255){
+                        console.log(colorPop)
+                        colorPop.classList.add("show");
+                    }else{
+                        colorPop.classList.remove("show");
+                    }
+
+                    let val = parseInt(input.value).toString(16).padStart(2, '0').toUpperCase();
+                    if(val == "NAN"){
+                        val = "  ";
+                    }
+                    val = val.split("");
+
+                    if(color == "red"){
+                        hexInputs[0].value = val[0];
+                        hexInputs[1].value = val[1];
+                    }else if(color == "green"){
+                        hexInputs[2].value = val[0];
+                        hexInputs[3].value = val[1];
+                    }else if(color == "blue"){
+                        hexInputs[4].value = val[0];
+                        hexInputs[5].value = val[1];
+                    }
+                });
+            })
+
+            start()
+        });
+
+        function start(){
+            newColor();
+            setRGB();
+        }
+    </script>
+</head>
+<body id="body">
+    <img src="interrogation.svg" name="help" class="help" onclick="helpMenu()">
+    <div class="game">
+        <div class="text">
+            <h1>Hue Are You?</h1>
+            <h2>A game of shapes and colors</h2>
+        </div>
+        <div id="submit">Submit Guess</div>
+        <div id="guess">
+            <div class="wrapper numWrap"><div class="hex num">#</div></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
+            <div class="hex hide">#</div>
+        </div>
+        <div id="rgb">
+            <input type="text" class="red" id="red" maxlength="3" autocomplete="off">
+            <input type="text" class="green" id="green" maxlength="3" autocomplete="off">
+            <input type="text" class="blue" id="blue" maxlength="3" autocomplete="off">
+        </div>
+        <div id="popups">
+            <div class="tooBig red">Too big!<br>Max is 255</div>
+            <div class="tooBig green">Too big!<br>Max is 255</div>
+            <div class="tooBig blue">Too big!<br>Max is 255</div>
+        </div>
+    </div>
+    <div class="helpMenu" id="help">
+        <h1>Hue Are You?</h1>
+        <p>
+            Hue Are You? is a game about guessing the hexcode of the background color. 
+        </p>
+        <h2>How to Play:</h2>
+        <p>
+            Input your guess into either the Hexcode area or the RGB area. 
+            After each guess, the hex digits turn different colors to help you find the correct combination. 
+        </p>
+        <br>
+        <div class="colors">
+            <div>
+                <label for="correct">Correct Guess</label>
+                <div class="wrapper">
+                    <input type="text" name="correct" class="hex correct" maxlength="1" placeholder="7" disabled>
+                </div>
+            </div>
+            <div>
+                <label for="closeup">Within 5 Above</label>
+                <div class="wrapper">
+                    <input type="text" name="closeup" class="hex close up" maxlength="1" placeholder="3" disabled></inputtype>
+                </div>
+            </div>
+            <div>
+                <label for="closeup">Within 5 Below</label>
+                <div class="wrapper">
+                    <input type="text" name="closeup" class="hex close down" maxlength="1" placeholder="B" disabled>
+                </div>
+            </div>
+        </div>
+        <h2>What are the colors at the bottom?</h2>
+        <p>
+            The 3 boxes at the bottom show the red, green, and blue values of the color. The brighter the color, the higher the value.&nbsp;
+            RGB values live on a scale from 0-255.&nbsp;For a little extra help, the input text turns white if the value is in the bottom half of the range!
+        </p>
+        <h2>What is a Hexcode?</h2>
+        <p>
+            A hexcode is a 6-digit representation of a color.&nbsp;It looks complicated, but is pretty easy to understand.&nbsp;
+            The first 2 digits represent the amount of red in the color, on a scale from 0-255.&nbsp;The second and third sets of digits represent green and blue. 
+            <br><br>There are multiple system of numbers in the world, refered to as "base-X".&nbsp;
+            Base-10, also known as decimal, is what you are familiar with, where you count to 10 and then restart from 0.&nbsp;
+            Base-16, or hexidecimal, is like if you had 16 fingers.&nbsp;The problem with this is that "12" is confusing.&nbsp;is it a 1 and a 2?&nbsp;Or is it a 12?&nbsp;
+            To make every number 1 digit long, the letters A-F are used.&nbsp;A=10, B=11, and so on.&nbsp;This means that 243(decimal)=F3(hexidecimal).&nbsp;
+            The easiest way to convert decimal to hexidecimal is actually to convert to base-2, also known as binary.&nbsp;
+            <br><br>Don't worry!&nbsp;You don't need to do the math- we do that part for you.&nbsp;
+            Try filling out either a hexcode or the colors at the bottom, the other will update automatically.
+        </p>
+    </div>
+</body>
+</html>
