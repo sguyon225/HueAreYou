@@ -99,6 +99,7 @@ function checkInput(code, index){
     if(code[index] == hexcode[index]){
         // If hex value is correct
         input.classList.add("correct");
+        input.setAttribute("disabled", "true")
     }else if( Math.abs(distance) < 5){
         //If hex value is within 5
         input.classList.add("close");

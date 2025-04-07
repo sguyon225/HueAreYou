@@ -1,3 +1,4 @@
+/* Basic CSS */
 *{
     margin: auto;
     text-align: center;
@@ -38,6 +39,16 @@ h2{
     margin: auto;
     margin-top: 5%;
 }
+#submit{
+    font-size: 18pt;
+    margin: auto;
+    margin-top: 8%;
+    width: 25%;
+    border: black 2px solid;
+    border-radius: 10px;
+}
+
+/* RGB area */
 #rgb{
     display: flex;
     gap: 5%;
@@ -52,6 +63,8 @@ h2{
     font-size: 300%;
     margin: 0;
 }
+
+/* Hexcode Area */
 #guess .wrapper{
     width: 12%;
     padding: 0;
@@ -96,6 +109,7 @@ h2{
 .wrapper input.correct {
     background-color: #4aff18;
     border-color: #32cd32;
+    
 }
 
 .wrapper input.close {
@@ -105,6 +119,8 @@ h2{
 .wrapper input::placeholder {
     color: #636261;
 }
+
+/* popup menus */
 .tooBig{
     background-color: red;
     color: white;
@@ -134,14 +150,7 @@ h2{
 .hide{
     visibility: hidden;
 }
-#submit{
-    font-size: 18pt;
-    margin: auto;
-    margin-top: 8%;
-    width: 25%;
-    border: black 2px solid;
-    border-radius: 10px;
-}
+
 /* Help Menu */
 .helpMenu{
     position: absolute;
