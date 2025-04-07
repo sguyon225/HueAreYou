@@ -87,11 +87,11 @@ h2{
     left: 20%
 }
 .wrapper input.up {
-    background-image: url('arrowUp.svg');
+    background-image: url('..\\imgs\\arrowUp.svg');
 }
 
 .wrapper input.down {
-    background-image: url('arrowDown.svg');
+    background-image: url('..\\imgs\\arrowDown.svg');
 }
 .wrapper input.correct {
     background-color: #4aff18;
