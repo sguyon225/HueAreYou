@@ -2,18 +2,33 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Hue Are You?</title>
+    <title>Huedle</title>
     <link rel="styleSheet" href="assets/css/styles.css">
     <script src="assets/scripts/script.js"></script>
 </head>
 <body id="body">
-    <img src="assets/imgs/help.svg" name="help" class="help" onclick="helpMenu()">
-    <div class="game">
+    <div onclick="helpMenu()" class="help" id="helpButton">
+        <svg viewBox="0 0 12 12" enable-background="new 0 0 12 12" id="Слой_1" version="1.1" xml:space="preserve" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" fill="#000000"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"><path d="M6,0C2.6862793,0,0,2.6862793,0,6s2.6862793,6,6,6s6-2.6862793,6-6S9.3137207,0,6,0z M6.5,9.5h-1v-1h1V9.5z M7.2651367,6.1738281C6.7329102,6.5068359,6.5,6.6845703,6.5,7v0.5h-1V7c0-0.9023438,0.7138672-1.3486328,1.2348633-1.6738281 C7.2670898,4.9931641,7.5,4.8154297,7.5,4.5c0-0.5517578-0.4487305-1-1-1h-1c-0.5512695,0-1,0.4482422-1,1V5h-1V4.5 c0-1.1025391,0.8969727-2,2-2h1c1.1030273,0,2,0.8974609,2,2C8.5,5.4023438,7.7861328,5.8486328,7.2651367,6.1738281z"></path></g></svg>
+        <svg viewBox="0 0 600 600" version="1.1" id="svg9724" xmlns="http://www.w3.org/2000/svg">
+            <g id="SVGRepo_iconCarrier">
+                <path d="M 447.70881 -12.781343 ..."></path>
+            </g>
+        </svg>
+    </div>
+    <div class="game" id="game">
         <div class="text">
-            <h1>Hue Are You?</h1>
+            <h1>Welcome to Huedle!</h1>
             <h2>A game of shapes and colors</h2>
         </div>
-        <div id="submit">Submit Guess</div>
+        <div id="submit" onclick="check()">Submit Guess</div>
+        <div class="above" id="above">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
         <div id="guess">
             <div class="wrapper numWrap"><div class="hex num">#</div></div>
             <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
@@ -22,7 +37,15 @@
             <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
             <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
             <div class="wrapper"><input type="text" class="hex digit" maxlength="1" autocomplete="off"></div>
-            <div class="hex hide">#</div>
+            <div class="wrapper numwrap"><div class="hex hide">#</div></div>
+        </div>
+        <div class="below" id="below">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
         </div>
         <div id="rgb">
             <input type="text" class="red" id="red" maxlength="3" autocomplete="off">
@@ -35,40 +58,58 @@
             <div class="tooBig blue">Too big!<br>Max is 255</div>
         </div>
     </div>
-    <div class="helpMenu" id="help">
-        <h1>Hue Are You?</h1>
+    <div class="win menu" id="win">
+        <h1>Correct!</h1>
+        <div id="guesses"></div>
+        <div id="avg"></div>
+        <div class="playAgain">Click the button below to play again!</div>
+        <button onclick="location.reload()">New Color</button>
+        <div id="answers"></div>
+    </div>
+    <div class="helpMenu menu" id="help">
+        <h1>Huedle!</h1>
         <p>
-            Hue Are You? is a game about guessing the hexcode of the background color. 
+            Huedle! is a game about guessing the hexcode of the background color. 
         </p>
         <h2>How to Play:</h2>
         <p>
-            Input your guess into either the Hexcode area or the RGB area. 
+            Input your guess into either the Hexcode area or the RGB area.&nbsp;
             After each guess, the hex digits turn different colors to help you find the correct combination. 
         </p>
         <br>
         <div class="colors">
-            <div>
-                <label for="correct">Correct Guess</label>
+            <div class="labels">
+                <p>Correct Guess</p>
+                <p>Within 5 Above</p>
+                <p>Within 5 Below</p>
+                <p>Between Guesses</p>
+            </div>
+            <div class="models">
                 <div class="wrapper">
                     <input type="text" name="correct" class="hex correct" maxlength="1" placeholder="7" disabled>
                 </div>
-            </div>
-            <div>
-                <label for="closeup">Within 5 Above</label>
+            
                 <div class="wrapper">
                     <input type="text" name="closeup" class="hex close up" maxlength="1" placeholder="3" disabled></inputtype>
                 </div>
-            </div>
-            <div>
-                <label for="closeup">Within 5 Below</label>
+            
                 <div class="wrapper">
-                    <input type="text" name="closeup" class="hex close down" maxlength="1" placeholder="B" disabled>
+                    <input type="text" name="closedown" class="hex close down" maxlength="1" placeholder="B" disabled>
                 </div>
+            
+                <div class="between">
+                    <div class="above close"><div>8</div></div>
+                    <div class="wrapper">
+                        <input type="text" name="close" class="hex close" maxlength="1" placeholder="?" disabled>
+                    </div>
+                    <div class="below close"><div>2</div></div>
+                </div>
+                
             </div>
         </div>
         <h2>What are the colors at the bottom?</h2>
         <p>
-            The 3 boxes at the bottom show the red, green, and blue values of the color. The brighter the color, the higher the value.&nbsp;
+            The 3 boxes at the bottom show the red, green, and blue values of the color.&nbsp;The brighter the color, the higher the value.&nbsp;
             RGB values live on a scale from 0-255.&nbsp;For a little extra help, the input text turns white if the value is in the bottom half of the range!
         </p>
         <h2>What is a Hexcode?</h2>

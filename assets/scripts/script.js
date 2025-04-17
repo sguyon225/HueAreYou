@@ -1,13 +1,14 @@
 var hexcode = "#";
 var invertHex = "#"
 var rgb = [];
-var invertRGB = [];
+var invRGB = [];
+var guesses = 0;
 
 // Makes a new color and sets it to the background color
 function newColor(){
     for(let i=0;i<6;i++){
         hexcode=hexcode+randomNumber();
-    }            
+    } 
     document.getElementById("body").style.backgroundColor = hexcode;
 
     hexToRGB();
@@ -16,11 +17,21 @@ function newColor(){
     console.log("hex: "+hexcode);
     console.log("invert hex: "+invertHex);
     console.log("rgb: "+rgb);
+    console.log("invert rgb: "+invRGB);
+}
+
+// makes random number from 0 to 15 and returns it in base 16
+function randomNumber(){
+    let num=Math.floor((Math.random()*100)) % 16;
+    if(num>9){
+        num=num.toString(16).toUpperCase();
+    }
+    return num;
 }
 
 // Inverts the color
 function invertColor(){
-    let invRGB = [255-rgb[0], 255-rgb[1], 255-rgb[2]];
+    invRGB = [255-rgb[0], 255-rgb[1], 255-rgb[2]];
 
     invertHex = "#"+invRGB[0].toString(16).padStart(2, '0')+invRGB[1].toString(16).padStart(2, '0')+invRGB[2].toString(16).padStart(2, '0');
     document.getElementsByClassName("text")[0].style.color = invertHex;
@@ -43,8 +54,9 @@ function hexToRGB(){
     rgb = [red, green, blue];
 }
 
-// Sets the rgb boxes' background color to their part of the hexcode
-function setRGB(){
+// Sets the rgb boxes and submit button colors
+function setColors(){
+    // Sets RGB boxes their part of the Hexcode
     let hexArr = hexcode.split("");
     document.getElementById("red").style.backgroundColor = "#"+hexArr[1]+hexArr[2]+"0000";
     document.getElementById("green").style.backgroundColor = "#00"+hexArr[3]+hexArr[4]+"00";
@@ -60,22 +72,39 @@ function setRGB(){
     if(rgb[2]<127.5){
         document.getElementById("blue").style.color = "white";
     }
-}
 
-// makes random number from 0 to 15 and returns it in hexcode
-function randomNumber(){
-    let num=Math.floor((Math.random()*100)) % 16;
-    if(num>9){
-        num=num.toString(16).toUpperCase();
+    // Set the submit button text color to white if it's too dark
+    let dark = 0;
+    let veryDark = 0;
+    let light = false;
+    for(color in invRGB){
+        if(invRGB[color]<100){  
+            dark++;
+        }else if(invRGB[color]<70){
+            veryDark++;
+        }else if(invRGB[color]>150){
+            light=true;
+        }
     }
-    return num;
+    
+    if (!light && dark>=2 || veryDark>2){
+        document.getElementById("submit").style.color = "white";
+    }
 }
 
 // Checks hexcode against input
-function check(code){
-    console.log("check: "+hexcode+" = "+code)
-    for(let i=1; i<7; i++){
-        checkInput(code, i)
+function check(){
+    let hexInputs = document.querySelectorAll(".digit");
+    let code = "#"+Array.from(hexInputs).map(i => i.value).join('');
+    if(code.length == 7){
+        for(let i=1; i<7; i++){
+            checkInput(code, i)
+        }
+        addHistory()
+        if (code == hexcode){
+            win()
+        }
+        guesses++;
     }
 }
 
@@ -106,10 +135,44 @@ function checkInput(code, index){
         if(distance<0){
             // Above
             input.classList.add("up");
-            console.log(distance);
         }else{
             // Below
             input.classList.add("down");
+        }
+    }
+}
+
+// Makes Guess history
+function addHistory(){
+    let guess = document.getElementById("guess").children;
+    let above = document.getElementById("above").children;
+    let below = document.getElementById("below").children;
+    for (let i=0; i<6; i++){
+        let digit=guess[i+1].firstChild;
+        console.log(above[i].textContent)
+        if(digit.classList.contains("close")){
+            // If new guess is closer
+            if (digit.classList.contains("down")){
+                let current = above[i].textContent;
+                if(current=="" || parseInt(current, 16)>parseInt(digit.value, 16)){
+                    above[i].textContent = digit.value;
+                    above[i].classList.add("close")
+                }
+            }else{
+                let current = below[i].textContent;
+                if(current=="" || parseInt(current, 16)<parseInt(digit.value, 16)){
+                    below[i].textContent = digit.value;
+                    below[i].classList.add("close")
+                }
+            }
+        }
+        // If guess is correct
+        else if(digit.classList.contains("correct")){
+            try{above[i].classList.remove("close")}catch(e){}
+            above[i].textContent = "";
+
+            try{below[i].classList.remove("close")}catch(e){}
+            below[i].textContent = "";
         }
     }
 }
@@ -122,13 +185,13 @@ function updateRGB(hexInputs, rgbInputs){
 
     // Make sure both hex digits are there, parses the hex into decimal
     if (hexInputs[0].value!="" && hexInputs[1].value!=""){
-        red = parseInt(hexInputs[0].value+hexInputs[1].value, 16);
+        red = parseInt(hexInputs[0].value+hexInputs[1].value, 16)+"";
     }
     if (hexInputs[2].value && hexInputs[3].value){
-        green = parseInt(hexInputs[3].value+hexInputs[2].value, 16);
+        green = parseInt(hexInputs[2].value+hexInputs[3].value, 16)+"";
     }
     if (hexInputs[4].value && hexInputs[5].value){
-        blue = parseInt(hexInputs[4].value+hexInputs[5].value, 16);
+        blue = parseInt(hexInputs[4].value+hexInputs[5].value, 16)+"";
     }
     // Inputs the updated hex value into the corresponding RGB box 
     if(red!=""){
@@ -157,9 +220,100 @@ function updateRGB(hexInputs, rgbInputs){
     }
 }
 
-// Toggles help menu
+// Toggles menu
+function toggleMenu(menu){
+    menu.classList.toggle("active");
+}
+
+// Toggles the help menu
 function helpMenu(){
-    document.getElementById("help").classList.toggle("active");
+    toggleMenu(document.getElementById("help"));
+}
+
+// Toggles the win game menu
+function win(){
+    let average = 0;
+    let total = guesses;
+    let games = 1;
+    if(!localStorage.getItem("guesses")){
+        localStorage.setItem("guesses",guesses);
+        localStorage.setItem("gamesPlayed",games);
+    }else{
+        total = parseInt(localStorage.getItem("guesses"))+guesses;
+        games = parseInt(localStorage.getItem("gamesPlayed"))+1;
+        localStorage.setItem("guesses", total);
+        localStorage.setItem("gamesPlayed", games);
+    }
+    average = total/games;
+
+    let triesPlural = "guesses"
+    let gamesPlural = "games"
+    if(guesses==1){
+        triesPlural = "guess"
+    }
+    if(games==1){
+        gamesPlural = "game"
+    }
+    let guessNum = document.createTextNode("You solved the puzzle in "+guesses+" "+triesPlural+"!");
+    let averages = document.createTextNode("You now have an average of "+Number(average.toFixed(2))+" guesses per game, over "+games+" "+gamesPlural+".");
+    document.getElementById("guesses").appendChild(guessNum);
+    
+    document.getElementById("avg").appendChild(averages);
+
+    makeWinMenu();
+
+    toggleMenu(document.getElementById("win"));
+
+    document.getElementById("game").style.display = "none";
+    document.getElementById("helpButton").style.display = "none";
+}
+
+// Populates the win menu with correct answers
+function makeWinMenu(){
+    let hexGuess = document.getElementById("guess");
+    let rgbGuess = document.getElementById("rgb");
+    let menu = document.getElementById("answers");
+
+    menu.appendChild(hexGuess);
+    menu.appendChild(rgbGuess);
+}
+
+// Makes help menu close when clicking off of it or pressing escape
+function setHelpMenu(){
+    // Close help menu when clicking background
+    
+    let menu = document.getElementById("help");
+    let isActive = false;
+    let activationDelay = false;
+
+    const observer = new MutationObserver(() => {
+        if (menu.classList.contains('active')) {
+            activationDelay = true;
+            isActive = true;
+
+            setTimeout(() => {
+                activationDelay = false;
+            }, 100);
+        } else {
+            isActive = false;
+        }
+    });
+
+    observer.observe(menu, { attributes: true, attributeFilter: ['class'] });
+
+    document.addEventListener('click', (e) => {
+        const clickedOutside = !menu.contains(e.target);
+
+        if (isActive && !activationDelay && clickedOutside) {
+            toggleMenu(menu);
+        }
+    });
+
+    document.addEventListener("keydown", (e) => {
+        if (isActive && e.key === 'Escape') {
+            toggleMenu(menu);
+        }
+    });
 }
 
 //Event listeners
@@ -167,19 +321,18 @@ document.addEventListener("DOMContentLoaded", function() {
     const hexInputs = document.querySelectorAll(".digit");
     const rgbInputs = document.getElementById("rgb").childNodes;
 
-    // Submission with enter
+    // Submission when pressing enter
     document.addEventListener("keypress", (e) => {
         if (e.key === 'Enter') {
-            let code = "#"+Array.from(hexInputs).map(i => i.value).join('');
-            if(code.length == 7){
-                check(code);
-            }
+            check()
+            let selected = document.activeElement;
+            selected.blur()
         }
     });
     
     // Event Listeners for the hexcode inputs
     hexInputs.forEach((input, index) => {
-        // Input Cleaning - Makes sure you can only input valid characters
+        // Input Cleaning
         input.addEventListener("beforeinput", (e) => {
             const value = e.data?.toUpperCase();
             if (e.inputType === "insertText" && !/^[A-F0-9]$/.test(value)) {
@@ -193,63 +346,114 @@ document.addEventListener("DOMContentLoaded", function() {
             if (value) {
                 e.target.value = value;
 
-                if (index < hexInputs.length - 1) {
-                    hexInputs[index + 1].focus();
+                let nextIndex = index + 1;
+                while (nextIndex <= 5) {
+                    let nextInput = hexInputs[nextIndex];
+                    if (!nextInput.disabled && !nextInput.readOnly) {
+                        nextInput.focus();
+                        break;
+                    }
+                    nextIndex++;
                 }
             }
             updateRGB(hexInputs, rgbInputs);
         });
 
-        // Backspace
+        // Keys to move back and forth
         input.addEventListener("keydown", (e) => {
             if (e.key === "Backspace") {
                 e.preventDefault();
                 if (input.value) {
                     input.value = "";
-                } else if (index > 0) {
-                    hexInputs[index - 1].focus();
-                    hexInputs[index - 1].value = "";
+                } else{
+                    let prevIndex = index - 1;
+                    while (prevIndex >= 0) {
+                    let prevInput = hexInputs[prevIndex];
+                    if (!prevInput.disabled) {
+                        prevInput.focus();
+                        prevInput.value = "";
+                        break;
+                    }
+                    prevIndex--;
                 }
-            }
-            updateRGB(hexInputs, rgbInputs);
-        });
-
-        // Delete
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "Delete") {
+                }
+            }else if (e.key === "Delete") {
                 e.preventDefault();
                 if (input.value) {
                     input.value = "";
-                } else if (index < 5) {
-                    hexInputs[index + 1].focus();
-                    hexInputs[index + 1].value = "";
+                } else{
+                    let nextIndex = index + 1;
+                    while (nextIndex <= 5) {
+                        let nextInput = hexInputs[nextIndex];
+                        if (!nextInput.disabled && !nextInput.readOnly) {
+                            nextInput.focus();
+                            nextInput.value = "";
+                            break;
+                        }
+                        nextIndex++;
+                    }
+                }
+            }else if (e.key === "ArrowLeft") {
+                let prevIndex = index - 1;
+                while (prevIndex >= 0) {
+                    let prevInput = hexInputs[prevIndex];
+                    if (!prevInput.disabled) {
+                        prevInput.focus();
+                        break;
+                    }
+                    prevIndex--;
+                }
+            }else if (e.key === "ArrowRight") {
+                let nextIndex = index + 1;
+                while (nextIndex <= 5) {
+                    let nextInput = hexInputs[nextIndex];
+                    if (!nextInput.disabled && !nextInput.readOnly) {
+                        nextInput.focus();
+                        break;
+                    }
+                    nextIndex++;
                 }
             }
+
             updateRGB(hexInputs, rgbInputs);
         });
 
-        // Left Arrow
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowLeft" && index > 0) {
-                hexInputs[index - 1].focus();
-            }
-        });
-
-        // Right Arrow
-        input.addEventListener("keydown", (e) => {
-            if (e.key === "ArrowRight" && index < 5) {
-                hexInputs[index + 1].focus();
-            }
-        });
-
-        // .focus to select value when filled box is entered
+        // .focus to always select the value when filled box is entered
         input.addEventListener("focus", () => {
-            setTimeout(() => input.setSelectionRange(0, 1), 0);
+            setTimeout(() => input.setSelectionRange(0, input.value.length), 0);
         });
+    });
+    // Makes arrow keys function when no input is selected
+    document.addEventListener("keydown", (e) => {
+        if (e.key === "ArrowLeft") {
+            const active = document.activeElement;
+            const isHexInput = Array.from(hexInputs).includes(active);
+    
+            if (!isHexInput) {
+                for (let i = hexInputs.length - 1; i >= 0; i--) {
+                    if (!hexInputs[i].disabled && !hexInputs[i].readOnly) {
+                        hexInputs[i].focus();
+                        break;
+                    }
+                }
+            }
+        }else if (e.key === "ArrowRight") {
+            const active = document.activeElement;
+            const isHexInput = Array.from(hexInputs).includes(active);
+    
+            if (!isHexInput) {
+                for (let i=0; i<=5; i++) {
+                    if (!hexInputs[i].disabled && !hexInputs[i].readOnly) {
+                        hexInputs[i].focus();
+                        break;
+                    }
+                }
+            }
+        }
     });
 
     // Event Listeners for RGB Inputs
-    rgbInputs.forEach((input, index) =>{
+    rgbInputs.forEach((input) => {
         // Validates input to be just numbers
         input.addEventListener("input", (e) => {
             e.target.value = e.target.value.replace(/\D/, "");
@@ -292,5 +496,6 @@ document.addEventListener("DOMContentLoaded", function() {
 // Starts the site generation process
 function start(){
     newColor();
-    setRGB();
+    setColors();
+    setHelpMenu();
 }

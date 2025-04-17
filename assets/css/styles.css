@@ -2,10 +2,11 @@
 *{
     margin: auto;
     text-align: center;
-    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+    font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    justify-items: center;
 }
 h1{
-    font-size: 8vw;
+    font-size: 7vw;
     -webkit-text-stroke: 4px var(--outline, black);
     margin-top: 2rem;
 }
@@ -19,7 +20,7 @@ h2{
     display: flex;
     flex-direction: column;
     height: 98vh;
-    max-width: 70%;
+    width: 760px;
     margin: auto;
     padding-bottom: 1em;
     margin-bottom: 10px;
@@ -37,7 +38,7 @@ h2{
     display: flex;
     justify-content: center;
     margin: auto;
-    margin-top: 5%;
+    margin-top: 1%;
 }
 #submit{
     font-size: 18pt;
@@ -46,6 +47,7 @@ h2{
     width: 25%;
     border: black 2px solid;
     border-radius: 10px;
+    user-select: none;
 }
 
 /* RGB area */
@@ -69,6 +71,8 @@ h2{
     width: 12%;
     padding: 0;
     margin: 0;
+    box-sizing: border-box;
+    position: relative;
 }
 #guess .wrapper .hex{
     width: 70%;
@@ -91,6 +95,7 @@ h2{
     right: 1vw;
     margin: 0;
     cursor: pointer;
+    z-index: 10;
 }
 #guess .wrapper .num{
     font-size: 5rem;
@@ -99,30 +104,56 @@ h2{
     position: relative;
     left: 20%
 }
+.wrapper input{
+    caret-color: transparent;
+}
+.wrapper input:focus{
+    transform: scale(1.15);
+    border-color: black;
+}
+.wrapper input::selection{
+    /*makes the text selection color clear  */
+    background-color: transparent;
+}
 .wrapper input.up {
     background-image: url('..\\imgs\\arrowUp.svg');
 }
-
 .wrapper input.down {
-    background-image: url('..\\imgs\\arrowDown.svg');
-}
-.wrapper input.correct {
-    background-color: #4aff18;
-    border-color: #32cd32;
-
-}
-.wrapper input.correct:disabled {
-    color: black;    
-}
-.wrapper input.close {
-    background-color: #f1c811;
-    border-color: #ffa500;
+    background-image: url('..\\imgs\\arrowDown.svg' );
 }
 .wrapper input::placeholder {
     color: #636261;
+    text-align: center;
+    display: block;
+    width: 100%;
+}
+.above, .below{
+    margin-top: 1%;
+    display: flex;
+    width: 72%
+}
+.above div, .below div{
+    width: 8%;
+    aspect-ratio: 1;
+    border-width: 2px;
+    border-style: solid;
+    border-color: transparent;
+    font-size: 27pt;
+    text-align: center;
+}
+.correct {
+    background-color: #4aff18 !important;
+    border-color: #32cd32 !important;
+}
+.correct:disabled {
+    color: black;    
+}
+.close{
+    background-color: #f1c811 !important;
+    border-color: #ffa500 !important;
 }
 
-/* popup menus */
+/* Warning popups */
 .tooBig{
     background-color: red;
     color: white;
@@ -153,14 +184,13 @@ h2{
     visibility: hidden;
 }
 
-/* Help Menu */
-.helpMenu{
+/* Menus */
+.menu{
     position: absolute;
     background-color: #e0e0e0;
     border-radius: 10px;
-    top: -100%;
     left: 8%;
-    max-width: 80%;
+    width: 80%;
     max-height: 80%;
     padding: 0 20px;
     overflow-y: scroll;
@@ -168,38 +198,54 @@ h2{
     scrollbar-width: thin;
     scrollbar-color: gray #e0e0e0;
 }
-.helpMenu h1{
+.menu h1{
     font-size: 20pt;
     -webkit-text-stroke: 0;
     margin-top: 2%;
     margin-bottom: 2%;
 }
-.helpMenu h2{
+.menu h2{
     font-size: 16pt;
     -webkit-text-stroke: 0;
     margin-top: 2%;
     margin-bottom: 2%;
 }
-.helpMenu p{
+.menu p{
     text-align: left;
 }
-.active{
-    top: 10%;
-    transition: .3s ease-out;
-}
 
-/* Help Menu Color Key */
+/* Help Menu  */
 .colors {
-    display: flex;
+    display: block;
 }
-.colors div {
+.labels, .models{
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    justify-content: space-evenly;
+    margin: auto;
 }
-
+.labels p{
+    width: 25%;
+    justify-self: center;
+    text-align: center;
+}
+.between{
+    text-align: center;
+    position: relative;
+    justify-content: center;
+}
+.between .above, .between .below{
+    margin: auto;
+    aspect-ratio: 1;
+    width: 20%;
+    justify-items: center;
+}
+.between .above div, .between .below div{
+    width: max-content;
+    font-size: 14pt;
+    text-align: center;
+}
 .helpMenu .wrapper input {
-    width: 30%;
+    width: 25%;
     aspect-ratio: 9/12;
     font-size: 24pt;
     text-align: center;
@@ -209,14 +255,46 @@ h2{
     background-repeat: no-repeat;
     background-position: center;
 }
-.helpmenu .wrapper input::placeholder {
+.helpMenu .wrapper input::placeholder {
     color: black;
 }
+.helpMenu{
+    top: -100%;
+}
+.active{
+    top: 10%;
+    transition: .3s ease-out;
+}
+
+/* Win Menu */
+#win{
+    aspect-ratio: 1;
+    overflow: hidden;
+    opacity: 0;
+    display: none;
+}
+#win *{
+    margin-top: 2%;
+}
+#win h1{
+    font-size: 40pt;
+    margin-top: 7%;
+}
+#win button{
+    font-size: 130%;
+
+}
+#win.active{
+    opacity: 100;
+    display: block;
+    /* transition: .3s; */
+}
+
   
 /* Smaller Screens */
 @media (max-width:1000px){
     h1{
-        font-size: 10vw;
+        font-size: 9vw;
         -webkit-text-stroke: 2px var(--outline, black);
         margin-top: 0;
     }
@@ -230,7 +308,6 @@ h2{
     #body{
         height: 100vh;
         box-shadow: none;
-        max-width: 100vw;
         margin: 0;
     }
     #game{
